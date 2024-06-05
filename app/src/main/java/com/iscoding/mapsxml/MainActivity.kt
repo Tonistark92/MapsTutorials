@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
 
         // Check and request the location permission
         checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        checkPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION)
     }
 
     private fun checkPermission(permission: String) {
