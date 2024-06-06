@@ -1,6 +1,7 @@
 package com.iscoding.mapsxml.data
 
 import com.iscoding.mapsxml.data.models.DirectionsResponse
+import com.iscoding.mapsxml.data.models.DistanceMatrixResponse
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -15,6 +16,12 @@ interface DirectionsApiService {
         @Query("destination") destination: String,
         @Query("key") apiKey: String
     ): DirectionsResponse
+    @GET("maps/api/distancematrix/json")
+    suspend fun getDistanceMatrix(
+        @Query("origins") origins: String,
+        @Query("destinations") destinations: String,
+        @Query("key") apiKey: String
+    ): DistanceMatrixResponse
 }
 
 object RetrofitInstance {

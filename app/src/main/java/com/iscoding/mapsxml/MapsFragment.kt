@@ -70,7 +70,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 .travelMode(AbstractRouting.TravelMode.DRIVING).withListener(CustomRouteListener(map))
                 .alternativeRoutes(true).waypoints(startDistination, latLng).build()
             rout.execute()
-
+            val destinations = listOf(
+                latLng
+            )
+            fetchDistanceMatrix(startDistination,destinations)
 //            fetchDirections(startDistination,latLng)
 
         }
@@ -336,6 +339,33 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 Log.e("DirectionsFragment", "HTTP error: ${e.message()}")
             } catch (e: Exception) {
                 Log.e("DirectionsFragment", "Error: ${e.message}")
+            }
+        }
+    }
+    private fun fetchDistanceMatrix(origin: LatLng, destinations: List<LatLng>) {
+        val apiKey = BuildConfig.API // Replace with your actual API key
+        val originStr = "${origin.latitude},${origin.longitude}"
+        val destinationsStr = destinations.joinToString("|") { "${it.latitude},${it.longitude}" }
+
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.getDistanceMatrix(originStr, destinationsStr, apiKey)
+                if (response.rows.isNotEmpty()) {
+                    response.rows[0].elements.forEachIndexed { index, element ->
+                        if (element.status == "OK") {
+                            Toast.makeText(requireContext(),"Destination $index: Distance: ${element.distance.text}, Duration: ${element.duration.text}", Toast.LENGTH_LONG).show()
+                            Log.d("DistanceMatrix", "Destination $index: Distance: ${element.distance.text}, Duration: ${element.duration.text}")
+                        } else {
+                            Log.e("DistanceMatrix", "Error for destination $index: ${element.status}")
+                        }
+                    }
+                } else {
+                    Log.e("DistanceMatrix", "No rows found in response")
+                }
+            } catch (e: HttpException) {
+                Log.e("DistanceMatrix", "HTTP error: ${e.message()}")
+            } catch (e: Exception) {
+                Log.e("DistanceMatrix", "Error: ${e.message}")
             }
         }
     }
